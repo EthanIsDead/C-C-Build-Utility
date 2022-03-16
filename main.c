@@ -32,7 +32,7 @@ int main(void)
 		char *sub_str;
 
 		sub_str = strtok(str, "\n");
-		sub_strs = (char**)realloc(sub_strs, sizeof(sub_strs) + sizeof(sub_str)); 
+		sub_strs = (char**)realloc(sub_strs, sizeof(sub_str)); 
 		*(sub_strs+idx) = sub_str; 
 
 		while(sub_str != NULL) 
@@ -62,7 +62,6 @@ int main(void)
 
 	////////////////////////////////////////////////////////////////////////////////////
 	
-
 	return 0; 
 }
 

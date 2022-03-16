@@ -1,8 +1,9 @@
 //TEST PROJECT PATH = /home/ethanojede/Documents/Programming Projects/C_Build_Utility/test_project
-//COMMAND TO LIST SPECIFIC FILES = ls | grep \.c
+//COMMAND TO LIST SPECIFIC FILES = ls | grep .c
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 int main(void)
 {
@@ -18,38 +19,49 @@ int main(void)
 	}
 		
 	pclose(fp);
-	printf(str); 
+	printf(str);
 
-	printf("---------------\n");	
-	
+	///////////////////////////////////////////////////////////////////////////////////
+	printf("---------------\n");
+
 	int num_of_files = 0; 
-		
+	char **sub_strs;
+
 	{
-		char tmp_str[256]; 
-		strcpy(tmp_str, str); 
+		int idx = 0; 
+		char *sub_str;
 
-		char *sub_strs;
-		sub_strs = strtok(tmp_str, "\n");
+		sub_str = strtok(str, "\n");
+		sub_strs = (char**)realloc(sub_strs, sizeof(sub_strs) + sizeof(sub_str)); 
+		*(sub_strs+idx) = sub_str; 
 
-		while(sub_strs != NULL) 
+		while(sub_str != NULL) 
 		{
-			num_of_files++; 
-			sub_strs = strtok(NULL, "\n");
+			idx++; 
+			printf("%s\n", sub_str);
+			sub_str = strtok(NULL, "\n");
+			sub_strs = (char**)realloc(sub_strs, sizeof(sub_strs) + sizeof(sub_str)); 
+			*(sub_strs+idx) = sub_str; 
 		}
+
+		num_of_files = idx; 
 	}
 
-	char *sub_strs;
-	sub_strs = strtok(str, "\n");
-
-	while(sub_strs != NULL) 
-	{
-		printf("%s\n", sub_strs);
-		sub_strs = strtok(NULL, "\n");
-	}
-
+	////////////////////////////////////////////////////////////////////////////////////
 	printf("---------------\n");	
 
 	printf("%d\n", num_of_files); 
+
+	////////////////////////////////////////////////////////////////////////////////////
+	printf("---------------\n");	
+
+	for(int i = 0; i < num_of_files; i++)
+	{
+		printf("%s\n", *(sub_strs+i));
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	
 
 	return 0; 
 }

@@ -1,4 +1,3 @@
-//TEST PROJECT PATH = /home/ethanojede/Documents/Programming Projects/C_Build_Utility/test_project
 //COMMAND TO LIST SPECIFIC FILES = ls | grep .c
 
 //INCLUDES
@@ -9,89 +8,110 @@
 //FUNCTIONS
 int main(void)
 {
-	
 	char cmd[] = "cd test_project && ls | grep .cpp";
 	FILE *fp = popen(cmd, "r"); 
+    
 	char buf[256];
-	char str[256]; 
+	char *sub_strs[256]; 
+    
+    int num_of_files = 0;
 
 	while(fgets(buf, sizeof(buf), fp) != 0)
 	{
-		strcat(str, buf); 	
+        sub_strs[num_of_files] = (char*)malloc(strlen(buf)+1); 
+		strcat(sub_strs[num_of_files], buf); 
+        
+        num_of_files++; 
 	}
 		
 	pclose(fp);
-	printf(str);
 
-	///////////////////////////////////////////////////////////////////////////////////
-	printf("---------------\n");
+    printf("---------------\n");
 
-	int num_of_files = 0;
+    for(int i = 0; i < num_of_files; i++)
+	    printf("%s",sub_strs[i]);
 
-	
-	char **sub_strs;
+    printf("---------------\n");
+	printf("%d\n", num_of_files);
+	printf("---------------\n");	
 
-	{
-		int idx = 0; 
-		int size = 0; 
-		char *sub_str;
+	char makefile_txt[1000] = ""; 
 
-		sub_str = strtok(str, "\n");
+    {
+        const char* output_txt = "output: "; 
+        const char* obj_file_exten_txt = ".o"; 
+        const char* cpp_file_exten_txt = ".cpp"; 
+    
+        strcat(makefile_txt, output_txt);
+    
+        for(int i = 0; i < num_of_files; i++)
+        {
+            char tmp_str[256] = ""; 
+            
+            for(int j = 0; j < strlen(sub_strs[i])-5; j++)
+            {
+                tmp_str[j] = *(sub_strs[i]+j);  
+            }
+                
+            strcat(makefile_txt, tmp_str); 
+            strcat(makefile_txt, obj_file_exten_txt); 
+            strcat(makefile_txt, " "); 
+        }
+    
+        strcat(makefile_txt, "\n\tg++ -Wall -g "); 
 
-		size += sizeof(sub_str); 
-		sub_strs = (char**)realloc(sub_strs, size); 
+        for(int i = 0; i < num_of_files; i++)
+        {
+            char tmp_str[256] = ""; 
+            
+            for(int j = 0; j < strlen(sub_strs[i])-5; j++)
+            {
+                tmp_str[j] = *(sub_strs[i]+j);  
+            }
+                
+            strcat(makefile_txt, tmp_str); 
+            strcat(makefile_txt, obj_file_exten_txt); 
+            strcat(makefile_txt, " "); 
+        }
 
-		*(sub_strs+idx) = sub_str; 
+        strcat(makefile_txt, "-o output\n");
 
-		while(sub_str != NULL) 
+        for(int i = 0; i < num_of_files; i++)
+        {
+            char tmp_str[256] = ""; 
+            
+            for(int j = 0; j < strlen(sub_strs[i])-5; j++)
+            {
+                tmp_str[j] = *(sub_strs[i]+j);  
+            }
+
+            strcat(makefile_txt, tmp_str); 
+            strcat(makefile_txt, obj_file_exten_txt); 
+            strcat(makefile_txt, ": "); 
+            strcat(makefile_txt, tmp_str); 
+            strcat(makefile_txt, cpp_file_exten_txt); 
+            strcat(makefile_txt, "\n\tg++ -c "); 
+            strcat(makefile_txt, tmp_str); 
+            strcat(makefile_txt, cpp_file_exten_txt);
+			
+			if(i < num_of_files-1)
+				strcat(makefile_txt, "\n"); 
+        }
+
+		FILE *fptr;
+
+		if ((fptr = fopen("test_project/Makefile","w")) == NULL)
 		{
-			idx++; 
-			printf("%s\n", sub_str);
-			sub_str = strtok(NULL, "\n");
-
-			size += sizeof(sub_str); 
-			sub_strs = (char**)realloc(sub_strs, size);
-
-			*(sub_strs+idx) = sub_str; 
+			printf("error opening file");
+			exit(1);
 		}
 
-		num_of_files = idx; 
+		fprintf(fptr,"%s", makefile_txt);
+		fclose(fptr); 
 	}
 
-	////////////////////////////////////////////////////////////////////////////////////
-	printf("---------------\n");	
-
-	printf("%d\n", num_of_files);
-
-	////////////////////////////////////////////////////////////////////////////////////
-	printf("---------------\n");	
-
-	for(int i = 0; i < num_of_files; i++)
-	{
-		printf("%s\n", *(sub_strs+i));
-	}
-
-	////////////////////////////////////////////////////////////////////////////////////
-	 
- 
-	
-	char *makefile_text; 
-
-	{
-		int size = 0; 
-		const char* output_text = "output: "; 
-		const char* obj_file_exten_txt = ".o"; 
-
-		size += sizeof(output_text); 
-		makefile_text = (char*)realloc(makefile_text, size);
-
-		strcat(makefile_text, output_text);
-	}
-
-	printf(makefile_text); 
-	printf("\n"); 
+	printf("%s", makefile_txt); 
+    printf("\n"); 
 	
 	return 0; 
 }
-
-
